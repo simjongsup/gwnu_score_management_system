@@ -1,21 +1,13 @@
-# gwnu_score_management_system
-강릉원주대학교 학생 성적 관리 시스템 레포트
-import java.io.BufferedReader;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 
 public class RankingPro_1 implements Comparable<RankingPro_1> {
     private int studentNumber, rank;
     private double koreanScore, englishScore, mathScore, totalScore, average;
     private String name;
-
-    public RankingPro_1() {
-
-    }
 
     //setter
     private void setNumber(int number) {
@@ -122,8 +114,15 @@ public class RankingPro_1 implements Comparable<RankingPro_1> {
             datum.setRank(++assignRank);
         }
 
+        String createCSV = "/Users/simjongseop/Downloads/gwnu_score_management_system-master/result_score.csv";
+        FileWriter fileWriter = new FileWriter(createCSV);
         for (RankingPro_1 datum : data) {
-            System.out.println(datum);
+            fileWriter.append("Number: " + datum.getNumber() + ", Name: " + datum.getNames() + ", Korean: "
+                    + datum.getKoreanScore() + ", English: " + datum.getEnglishScore() + ", Math: "
+                    + datum.getMathScore() + ", Total: " + datum.getTotalScore() + ", Average: "
+                    + datum.getAverage() + ", Rank: " + datum.getRank() + "\n");
         }
+        fileWriter.flush();
+        fileWriter.close();
     }
 }
