@@ -5,11 +5,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class RankingPro_1 implements Comparable<RankingPro_1> {
-    private int studentNumber, rank;
-    private double koreanScore, englishScore, mathScore, totalScore, average;
-    private String name;
+    //field variable
+    private int studentNumber, rank;    //학생 번호 및 학생 등수
+    private double koreanScore, englishScore, mathScore, totalScore, average;   //국어 점수, 영어 점수, 수학 점수, 총 점수, 평균 점수
+    private String name;    //학생 이름
 
-    //setter
+    /**
+     * 학생 정보 설정 하는 메소드
+     */
     private void setNumber(int number) {
         this.studentNumber = number;
     }
@@ -42,7 +45,9 @@ public class RankingPro_1 implements Comparable<RankingPro_1> {
         this.average = average;
     }
 
-    //getter
+    /**
+     * 학생 정보 가져 오는 메소드
+     */
     private int getNumber() {
         return this.studentNumber;
     }
@@ -75,21 +80,27 @@ public class RankingPro_1 implements Comparable<RankingPro_1> {
         return this.average;
     }
 
+    /**
+     * 학생 정보 출력 format
+     */
     @Override
     public String toString() {
         return "No. " + studentNumber + " Name: " + name + " Korean: " + koreanScore + " English: " + englishScore + " Math: " + mathScore + " TotalScore: " + totalScore + " Average: " + average + " Rank: " + rank;
     }
 
+    /**
+     * 평균 점수로 내림 차순 정렬
+     */
     @Override
     public int compareTo(RankingPro_1 rankingPro_1) {
-        return this.getAverage() < rankingPro_1.getAverage() ? 1 : -1;
+        return this.getAverage() <= rankingPro_1.getAverage() ? 1 : -1;
     }
 
     public static void main(String[] args) throws IOException {
-        String line = "";
-        ArrayList<RankingPro_1> dataList = new ArrayList<RankingPro_1>();
-        int i = 0, assignRank = 0;
-        BufferedReader bufferedReader = Files.newBufferedReader(Paths.get("/Users/simjongseop/Downloads/gwnu_score_management_system-master/score.csv"));
+        String line;    //csv 파일에서 한 줄 씩 읽어온 정보를 담는 변수
+        ArrayList<RankingPro_1> dataList = new ArrayList<>();   //읽어온 데이터 저장하는 리스트
+        int i = 0, assignRank = 1;  //배열 크기를 위한 변수, 등수를 위한 변수
+        BufferedReader bufferedReader = Files.newBufferedReader(Paths.get("/Users/simjongseop/Downloads/gwnu_score_management_system-master/score.csv"));   //데이터 파일 읽어오기
 
         while ((line = bufferedReader.readLine()) != null) {
             String[] parser = line.split(",");
@@ -110,17 +121,25 @@ public class RankingPro_1 implements Comparable<RankingPro_1> {
         RankingPro_1[] data = dataList.toArray(new RankingPro_1[i]);
         Arrays.sort(data);
 
-        for (RankingPro_1 datum : data) {
-            datum.setRank(++assignRank);
+        //등수 중복 처리
+        data[0].setRank(assignRank);
+        for (int j = 0; j < data.length; j++) {
+            for (int k = j + 1; k < data.length; k++) {
+                if (data[j].getTotalScore() == data[k].getTotalScore())
+                    data[k].setRank(data[j].getRank());
+                else {
+                    assignRank++;
+                    data[k].setRank(assignRank);
+                    break;
+                }
+            }
         }
 
+        //csv 파일로 출력
         String createCSV = "/Users/simjongseop/Downloads/gwnu_score_management_system-master/result_score.csv";
         FileWriter fileWriter = new FileWriter(createCSV);
         for (RankingPro_1 datum : data) {
-            fileWriter.append("Number: " + datum.getNumber() + ", Name: " + datum.getNames() + ", Korean: "
-                    + datum.getKoreanScore() + ", English: " + datum.getEnglishScore() + ", Math: "
-                    + datum.getMathScore() + ", Total: " + datum.getTotalScore() + ", Average: "
-                    + datum.getAverage() + ", Rank: " + datum.getRank() + "\n");
+            fileWriter.append("Number: ").append(String.valueOf(datum.getNumber())).append(", Name: ").append(datum.getNames()).append(", Korean: ").append(String.valueOf(datum.getKoreanScore())).append(", English: ").append(String.valueOf(datum.getEnglishScore())).append(", Math: ").append(String.valueOf(datum.getMathScore())).append(", Total: ").append(String.valueOf(datum.getTotalScore())).append(", Average: ").append(String.valueOf(datum.getAverage())).append(", Rank: ").append(String.valueOf(datum.getRank())).append("\n");
         }
         fileWriter.flush();
         fileWriter.close();
